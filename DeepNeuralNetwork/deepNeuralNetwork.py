@@ -66,7 +66,11 @@ def initialize_parameters_deep(layer_dims):
     L = len(layer_dims)
 
     for l in range(1, L):
-        parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l-1])/np.sqrt(layer_dims[l-1]) #*0.01
+        # because we are using RelU beter to user the following initialization
+        # keeping close around 1 to prevent vanisching / exploding gradients
+        # parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l-1])*np.sqrt(2/layer_dims[l-1])
+        #parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l-1])/np.sqrt(layer_dims[l-1]) #*0.01
+        parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l - 1]) *0.01
         parameters['b' + str(l)] = np.zeros((layer_dims[l], 1))
 
         assert(parameters['W' + str(l)].shape == (layer_dims[l], layer_dims[l-1]))
@@ -447,10 +451,10 @@ def main():
     train_x_orig, train_y, test_x_orig, test_y, classes = load_data()
 
     # Example of a picture
-    index = 10
-    print("y = " + str(train_y[0, index]) + ". It's a " + classes[train_y[0, index]].decode("utf-8") + " picture.")
-    plt.imshow(train_x_orig[index])
-    plt.show()
+    # index = 10
+    # print("y = " + str(train_y[0, index]) + ". It's a " + classes[train_y[0, index]].decode("utf-8") + " picture.")
+    # plt.imshow(train_x_orig[index])
+    # plt.show()
 
     # Explore your dataset
     m_train = train_x_orig.shape[0]
@@ -481,24 +485,28 @@ def main():
     n_y =1
     layer_dims = (n_x, n_h, n_y)
 
-    """
+
     # train two layer network
-    parameters = two_layer_model(train_x, train_y, layers_dims=(n_x, n_h, n_y), num_iterations=2500, print_cost=True)
+    # parameters = two_layer_model(train_x, train_y, layers_dims=(n_x, n_h, n_y), num_iterations=2500, print_cost=True)
+    #
+    # # predict model , change the function in dnn_app_utils_v2 , vectorize with np.ceil
+    # predictions_train = predict(train_x, train_y, parameters)
+    #
+    # predictions_test = predict(test_x, test_y, parameters)
 
-    # predict model , change the function in dnn_app_utils_v2 , vectorize with np.ceil
-    predictions_train = predict(train_x, train_y, parameters)
-
-    predictions_test = predict(test_x, test_y, parameters)
-    """
     # now L-layer neural network
-    layers_dims = [12288, 20, 7, 5, 1] # 5 layer model
+    #layers_dims = [12288, 20, 7, 5, 1] # 5 layer model
+    layers_dims = [12288, 2000, 700, 500, 1]  # 5 layer model
+    #parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=2500, print_cost=True)
     parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations=2500, print_cost=True)
 
+    print("train accuracy")
     pred_train = predict(train_x, train_y, parameters)
 
+    print("test/dev accuracy")
     pred_test = predict(test_x, test_y, parameters)
 
-    print_mislabeled_images(classes, test_x, test_y, pred_test)
+    #print_mislabeled_images(classes, test_x, test_y, pred_test)
 
 
 
